@@ -9,8 +9,8 @@ from pytorch3d.structures.meshes import join_meshes_as_batch
 from pytorch3d.structures.pointclouds import join_pointclouds_as_batch
 from torch.utils.data import DataLoader
 
-from render_pipeline.losses import loss_IOU_render_sensor, chamfer_distance_one_way
-from render_pipeline.shapenet_core import ShapeNetCore_SCANnotate
+from retrieval_pipeline.losses import loss_IOU_render_sensor, chamfer_distance_one_way
+from retrieval_pipeline.shapenet_core import ShapeNetCore_SCANnotate
 from misc.utils import shapenet_category_dict
 
 
@@ -149,7 +149,6 @@ class CAD_Search_Algos(object):
                                                                        self.mask_depth_valid_render_GT,
                                                                        mask_depth_valid_render_pred)
 
-            # L1 norm for point distance here
             chamfer_dist_x = chamfer_distance_one_way(x=pcl_target.points_padded(),
                                                       y=cad_pcl_batch.points_padded(),
                                                       point_reduction='mean',

@@ -1,6 +1,6 @@
 #!/bin/bash
 DIR_PATH=$(cd $(dirname "${BASH_SOURCE:-$0}") && pwd)
-file="render_pipeline/CAD_Pose_refinement.py"
+file="retrieval_pipeline/CAD_Pose_refinement.py"
 execute_path=$DIR_PATH/$file
 
 for ARGUMENT in "$@"

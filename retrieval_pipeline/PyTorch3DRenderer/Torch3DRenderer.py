@@ -2,7 +2,7 @@ import torch
 from pytorch3d.renderer import RasterizationSettings, MeshRasterizer
 from pytorch3d.renderer.cameras import PerspectiveCameras
 
-from render_pipeline.PyTorch3DRenderer.pytorch3d_rasterizer_custom import MeshRendererScannet
+from retrieval_pipeline.PyTorch3DRenderer.pytorch3d_rasterizer_custom import MeshRendererScannet
 from .SimpleShader import SimpleShader
 
 

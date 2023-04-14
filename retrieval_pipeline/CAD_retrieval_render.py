@@ -17,9 +17,9 @@ import torch
 import time
 import pickle
 from config import load_config
-from render_pipeline.CAD_Search_Algos.CAD_search_algos import CAD_Search_Algos
-from render_pipeline.CAD_Search_Algos.prepare_scene import Prepare_Scene
-from render_pipeline.utils_CAD_retrieval import compose_cad_transforms, load_textured_cad_model
+from retrieval_pipeline.CAD_Search_Algos.CAD_search_algos import CAD_Search_Algos
+from retrieval_pipeline.CAD_Search_Algos.prepare_scene import Prepare_Scene
+from retrieval_pipeline.utils_CAD_retrieval import compose_cad_transforms, load_textured_cad_model
 import open3d as o3d
 import copy
 from misc.utils import shapenet_category_dict

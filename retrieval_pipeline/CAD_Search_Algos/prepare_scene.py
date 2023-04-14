@@ -7,10 +7,10 @@ import torch
 import torch.nn.functional as F
 from pytorch3d.structures import Meshes
 
-from render_pipeline.PyTorch3DRenderer.Torch3DRenderer import initialize_renderer, prepare_GT_data
-from render_pipeline.load_ScanNet_data import load_axis_alignment_mat
-from render_pipeline.utils_CAD_retrieval import cut_meshes
-from render_pipeline.utils_CAD_retrieval import load_depth_img
+from retrieval_pipeline.PyTorch3DRenderer.Torch3DRenderer import initialize_renderer, prepare_GT_data
+from retrieval_pipeline.load_ScanNet_data import load_axis_alignment_mat
+from retrieval_pipeline.utils_CAD_retrieval import cut_meshes
+from retrieval_pipeline.utils_CAD_retrieval import load_depth_img
 from misc.utils import transform_ScanNet_to_py3D, alignPclMesh, transform_ARKIT_to_py3D
 
 

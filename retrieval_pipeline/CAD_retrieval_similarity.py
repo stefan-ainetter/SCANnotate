@@ -23,11 +23,11 @@ from misc.utils import shapenet_category_dict
 from pytorch3d.structures.meshes import join_meshes_as_batch
 from pytorch3d.ops import sample_points_from_meshes
 from pytorch3d.structures import Pointclouds
-from render_pipeline.CAD_Search_Algos.prepare_scene import Prepare_Scene
+from retrieval_pipeline.CAD_Search_Algos.prepare_scene import Prepare_Scene
 from pytorch3d.structures import Meshes
 from losses import loss_IOU_render_sensor, chamfer_distance_one_way
 import numpy as np
-from render_pipeline.utils_CAD_retrieval import load_textured_cad_model
+from retrieval_pipeline.utils_CAD_retrieval import load_textured_cad_model
 import open3d as o3d
 
 

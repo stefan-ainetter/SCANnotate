@@ -20,13 +20,13 @@ from pytorch3d.io import load_obj
 import pickle
 from PoseRefinementModel import PoseRefineModel
 from config import load_config
-from render_pipeline.CAD_Search_Algos.prepare_scene import Prepare_Scene
+from retrieval_pipeline.CAD_Search_Algos.prepare_scene import Prepare_Scene
 from pytorch3d.ops import sample_points_from_meshes
 import numpy as np
 from pytorch3d.structures import Pointclouds
-from render_pipeline.losses import chamfer_distance_one_way
+from retrieval_pipeline.losses import chamfer_distance_one_way
 from misc.utils import shapenet_category_dict
-from render_pipeline.utils_CAD_retrieval import load_textured_cad_model
+from retrieval_pipeline.utils_CAD_retrieval import load_textured_cad_model
 import open3d as o3d
 
 

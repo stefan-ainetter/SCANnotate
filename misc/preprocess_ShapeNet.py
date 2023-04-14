@@ -17,7 +17,7 @@ from pytorch3d.io import IO
 from misc.utils import shapenet_category_dict
 import trimesh
 import open3d as o3d
-from render_pipeline.utils_CAD_retrieval import normalize_mesh
+from retrieval_pipeline.utils_CAD_retrieval import normalize_mesh
 
 
 def simplify_mesh(mesh_path, max_faces=20000):
