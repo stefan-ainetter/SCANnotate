@@ -121,9 +121,6 @@ class CAD_Search_Algos(object):
         start = time.time()
         for it, batch in enumerate(self.shapenet_loader):
 
-            if it == 51:
-               break
-
             cad_mesh_batch = batch['mesh'].to(device=self.device)
             cad_pcl_batch = batch['pcl'].to(device=self.device)
 
