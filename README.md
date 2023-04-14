@@ -116,7 +116,7 @@ Final results after 9DOF pose refinement will be written to `/results/ScanNet/$s
 ## Citation
 If you found this work useful for your publication, please consider citing us:
 
-```
+```bibtex
 @inproceedings{ainetter2023automatically,
   title={Automatically Annotating Indoor Images with CAD Models via RGB-D Scans},
   author={Ainetter, Stefan and Stekovic, Sinisa and Fraundorfer, Friedrich and Lepetit, Vincent},
