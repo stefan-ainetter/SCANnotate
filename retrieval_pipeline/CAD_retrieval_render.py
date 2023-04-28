@@ -4,9 +4,9 @@ import os
 import sys
 
 parser = argparse.ArgumentParser(description="CAD Model Retrieval")
-parser.add_argument("--config", type=str, default='ARKitScenes.ini', help="Configuration file")
+parser.add_argument("--config", type=str, default='ScanNet.ini', help="Configuration file")
 parser.add_argument("--data_split", type=str, default="", help="data split")
-parser.add_argument("--device", type=str, default="0", help="device")
+parser.add_argument("--device", type=str, default="", help="device")
 
 os.environ["CUDA_VISIBLE_DEVICES"] = parser.parse_args().device
 current = os.path.dirname(os.path.realpath(__file__))
