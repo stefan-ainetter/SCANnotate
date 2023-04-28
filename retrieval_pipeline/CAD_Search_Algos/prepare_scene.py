@@ -7,12 +7,14 @@ import torch
 import torch.nn.functional as F
 from pytorch3d.structures import Meshes
 
-from retrieval_pipeline.PyTorch3DRenderer.Torch3DRenderer import initialize_renderer, prepare_GT_data
+from retrieval_pipeline.PyTorch3DRenderer.Torch3DRenderer import initialize_renderer
 from retrieval_pipeline.load_ScanNet_data import load_axis_alignment_mat
 from retrieval_pipeline.utils_CAD_retrieval import cut_meshes
 from retrieval_pipeline.utils_CAD_retrieval import load_depth_img
 from misc.utils import transform_ScanNet_to_py3D, alignPclMesh, transform_ARKIT_to_py3D
+from pytorch3d.structures.meshes import join_meshes_as_batch
 
+import cv2
 
 class Prepare_Scene():
     def __init__(self, config, config_general, data_split, parent_dir, device):
@@ -69,6 +71,13 @@ class Prepare_Scene():
             scene_path = os.path.join(self.parent, data_path, 'scans', scene_obj.scene_name,
                                       scene_obj.scene_name + '_vh_clean_2.ply')
 
+        elif self.dataset_name == 'custom_dataset':
+            T_mat = transform_ScanNet_to_py3D()
+            align_mat = np.eye(4)
+
+            scene_path = os.path.join(self.parent, data_path, 'scans', scene_obj.scene_name,
+                                      scene_obj.scene_name + '_detection.ply')
+
         elif self.dataset_name == 'ARKitScenes':
             T_mat = transform_ARKIT_to_py3D()
             align_mat = np.eye(4)
@@ -82,6 +91,33 @@ class Prepare_Scene():
         mesh_scene = alignPclMesh(mesh_scene, axis_align_matrix=align_mat, T=T_mat)
 
         return mesh_scene
+
+    def prepare_GT_data(self,scene_mesh, mesh_bg, renderer, n_views, device):
+        with torch.no_grad():
+            scene_mesh = scene_mesh.extend(n_views * self.config.getint('batch_size') * 1)
+
+            fragments_gt = renderer(meshes_world=scene_mesh.to(device))
+            depth_gt = fragments_gt.zbuf
+
+            mask_depth_valid_render_gt = torch.zeros_like(depth_gt)
+            mask_depth_valid_render_gt[fragments_gt.pix_to_face != -1] = 1
+
+            depth_gt[fragments_gt.pix_to_face == -1] = torch.max(depth_gt[fragments_gt.pix_to_face > 0])
+            max_depth_gt = torch.max(depth_gt)
+
+            mesh_bg = mesh_bg.extend(n_views * self.config.getint('batch_size') * 1)
+
+            fragments_bg = renderer(meshes_world=mesh_bg.to(device))
+            depth_bg = fragments_bg.zbuf
+            depth_bg[fragments_bg.pix_to_face == -1] = max_depth_gt
+
+            mask_gt = torch.zeros_like(depth_gt)
+            mask_bg = torch.zeros_like(depth_gt)
+            mask_gt[depth_gt < depth_bg] = 1.
+            mask_bg[depth_gt >= depth_bg] = 1.
+
+            del fragments_gt, fragments_bg
+        return depth_gt, depth_bg, mask_gt, mask_depth_valid_render_gt, mesh_bg
 
     def prepare_box_item_for_rendering(self, box_item, inst_seg_3d, mesh_scene, scene_name, num_scales, rotations):
 
@@ -122,6 +158,17 @@ class Prepare_Scene():
                                                   depth_frame_name)
                 depth_img = load_depth_img(depth_img_path_new)
                 depth_imgs.append(depth_img)
+
+        elif self.dataset_name == 'custom_dataset':
+            for depth_cnt, depth_frame_name in enumerate(depth_img_list):
+                depth_img_path_new = os.path.join(self.parent, data_path, 'extracted', scene_name, 'depths',
+                                                  depth_frame_name + '.png')
+                depth_img = load_depth_img(depth_img_path_new)
+                depth_imgs.append(depth_img)
+                #depth_out_path = '/home/stefan/PycharmProjects/SCANnotate_test/data/custom_dataset/debug/depth_out'
+                #depth_norm = ((depth_img / np.max(depth_img)) * 255).astype('uint8')
+                #cv2.imwrite(os.path.join(depth_out_path, str(depth_cnt) + '_depth.png'), depth_norm)
+
         elif self.dataset_name == 'ARKitScenes':
             for depth_cnt, depth_frame_name in enumerate(depth_img_list):
                 depth_img_path_new = os.path.join(self.parent, data_path, 'scans', scene_name, scene_name + '_frames',
@@ -143,6 +190,49 @@ class Prepare_Scene():
         mask_depth_valid_sensor = torch.zeros_like(depth_sensor).to(self.device)
         mask_depth_valid_sensor[depth_sensor > 0] = 1
 
+        depth_gt_tensor = None
+        depth_bg_tensor = None
+        mask_gt_tensor = None
+        mask_depth_valid_render_gt_tensor = None
+        mesh_bg_list = []
+        for view_cnt, (R_cnt,T_cnt) in enumerate(zip(R,T)):
+            R_cnt = np.expand_dims(R_cnt,axis=0)
+            T_cnt = np.expand_dims(T_cnt,axis=0)
+
+            renderer_scene = initialize_renderer(1, self.config.getfloat('img_scale'), R_cnt, T_cnt, intrinsics,
+                                                 self.config.getint('batch_size'),
+                                                 1,
+                                                 self.device,
+                                                 self.config_general.getfloat('img_height'),
+                                                 self.config_general.getfloat('img_width'))
+
+            depth_gt, depth_bg, mask_gt, mask_depth_valid_render_gt, mesh_bg = self.prepare_GT_data(scene_mesh,
+                                                                                                    mesh_bg,
+                                                                                                    renderer_scene,
+                                                                                                        1,
+                                                                                                    self.device)
+            del renderer_scene
+
+            if depth_gt_tensor is None:
+                depth_gt_tensor = copy.deepcopy(depth_gt)
+                depth_bg_tensor = copy.deepcopy(depth_bg)
+                mask_gt_tensor = copy.deepcopy(mask_gt)
+                mask_depth_valid_render_gt_tensor = copy.deepcopy(mask_depth_valid_render_gt)
+            else:
+                depth_gt_tensor = torch.cat([depth_gt_tensor, depth_gt], dim=0)
+                depth_bg_tensor = torch.cat([depth_bg_tensor, depth_bg], dim=0)
+                mask_gt_tensor = torch.cat([mask_gt_tensor, mask_gt], dim=0)
+                mask_depth_valid_render_gt_tensor = torch.cat([mask_depth_valid_render_gt_tensor,
+                                                               mask_depth_valid_render_gt], dim=0)
+
+            mesh_bg_list.append(mesh_bg)
+
+        del scene_mesh
+        torch.cuda.empty_cache()
+
+        mesh_bg_tensor = join_meshes_as_batch(mesh_bg_list)
+        max_depth_gt = torch.max(depth_gt_tensor)
+
         renderer = initialize_renderer(n_views, self.config.getfloat('img_scale'), R, T, intrinsics,
                                        self.config.getint('batch_size'),
                                        len(self.rotations) * self.num_scales,
@@ -150,16 +240,6 @@ class Prepare_Scene():
                                        self.config_general.getfloat('img_height'),
                                        self.config_general.getfloat('img_width'))
 
-        scene_mesh = scene_mesh.extend(n_views * self.config.getint('batch_size') *
-                                       len(self.rotations) * self.num_scales)
-
-        mesh_bg = mesh_bg.extend(n_views * self.config.getint('batch_size') * len(self.rotations) *
-                                 self.num_scales)
-
-        depth_gt, depth_bg, mask_gt, mask_depth_valid_render_gt, max_depth_gt = prepare_GT_data(scene_mesh,
-                                                                                                mesh_bg,
-                                                                                                renderer,
-                                                                                                self.device)
-
-        return n_views, scene_mesh, mesh_bg, renderer, depth_gt, depth_bg, mask_gt, mask_depth_valid_render_gt, \
+        return n_views, mesh_bg_tensor, renderer, depth_gt_tensor, depth_bg_tensor, mask_gt_tensor, \
+            mask_depth_valid_render_gt_tensor, \
             max_depth_gt, mesh_obj, depth_sensor, mask_depth_valid_sensor

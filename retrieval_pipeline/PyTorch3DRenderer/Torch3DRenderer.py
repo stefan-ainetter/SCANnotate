@@ -32,7 +32,7 @@ def initialize_renderer(n_views, img_scale, R, T, intrinsics, batch_size, num_or
     principal_point = principal_point.repeat(n_views, 1)
     principal_point = principal_point.repeat_interleave(repeats=num_orientations_per_mesh * batch_size, dim=0)
 
-    fx, fy = ((intrinsics[0, 0] * img_scale)), ((intrinsics[1, 1] * img_scale))
+    fx, fy = (intrinsics[0, 0] * img_scale), (intrinsics[1, 1] * img_scale)
     focal_length = torch.as_tensor([fx, fy])[None].type(torch.FloatTensor).to(device)
     focal_length = focal_length.repeat(n_views, 1)
     focal_length = focal_length.repeat_interleave(repeats=num_orientations_per_mesh * batch_size, dim=0)

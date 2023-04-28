@@ -72,14 +72,26 @@ class CAD_Search_Algos(object):
         self.num_workers = config.getint('num_workers')
 
         self.mesh_obj = mesh_obj
-        self.mesh_bg = mesh_bg
         self.max_depth_GT = max_depth_gt
-        self.depth_bg = depth_bg
-        self.mask_GT = mask_gt
-        self.depth_GT = depth_gt
+
+        # self.mesh_bg = mesh_bg
+        self.mesh_bg = mesh_bg.extend(N=self.num_orientations_per_mesh * self.num_scales)  # mesh_bg
+        # self.depth_bg = depth_bg
+        self.depth_bg = depth_bg.repeat_interleave(repeats=self.num_orientations_per_mesh * self.num_scales,
+                                                   dim=0)  # mesh_bg
+
+        # self.mask_GT = mask_gt
+        self.mask_GT = mask_gt.repeat_interleave(repeats=self.num_orientations_per_mesh * self.num_scales, dim=0)
+
+        # self.depth_GT = depth_gt
+        self.depth_GT = depth_gt.repeat_interleave(repeats=self.num_orientations_per_mesh * self.num_scales, dim=0)
+
         self.depth_sensor = depth_sensor
         self.mask_depth_valid_sensor = mask_depth_valid_sensor
-        self.mask_depth_valid_render_GT = mask_depth_valid_render_gt
+        # self.mask_depth_valid_render_GT = mask_depth_valid_render_gt
+        self.mask_depth_valid_render_GT = \
+            mask_depth_valid_render_gt.repeat_interleave(repeats=self.num_orientations_per_mesh *
+                                                                 self.num_scales, dim=0)
 
         self.cad_transformations = cad_transformations
         self.transform_dict = transform_dict

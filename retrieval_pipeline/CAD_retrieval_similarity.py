@@ -242,7 +242,7 @@ def main(args):
                         num_scales = config.getint('num_scales')
                         rotations = config.getstruct('rotations')
 
-                        n_views_selected, scene_mesh, mesh_bg, renderer, depth_gt, depth_bg, mask_gt, \
+                        n_views_selected, mesh_bg, renderer, depth_gt, depth_bg, mask_gt, \
                             mask_depth_valid_render_gt, max_depth_gt, mesh_obj, depth_sensor, \
                             mask_depth_valid_sensor = prepare_scene_obj.prepare_box_item_for_rendering(box_item_main,
                                                                                                        scene_obj.inst_seg_3d,

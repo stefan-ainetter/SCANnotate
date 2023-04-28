@@ -4,9 +4,9 @@ import os
 import sys
 
 parser = argparse.ArgumentParser(description="CAD Model Retrieval")
-parser.add_argument("--config", type=str, default='ScanNet.ini', help="Configuration file")
+parser.add_argument("--config", type=str, default='ARKitScenes.ini', help="Configuration file")
 parser.add_argument("--data_split", type=str, default="", help="data split")
-parser.add_argument("--device", type=str, default="", help="device")
+parser.add_argument("--device", type=str, default="0", help="device")
 
 os.environ["CUDA_VISIBLE_DEVICES"] = parser.parse_args().device
 current = os.path.dirname(os.path.realpath(__file__))
@@ -76,7 +76,7 @@ def main(args):
                 num_scales = config.getint('num_scales')
                 rotations = config.getstruct('rotations')
 
-                n_views_selected, scene_mesh, mesh_bg, renderer, depth_gt, depth_bg, mask_gt, \
+                n_views_selected, mesh_bg, renderer, depth_gt, depth_bg, mask_gt, \
                     mask_depth_valid_render_gt, max_depth_gt, mesh_obj, depth_sensor, \
                     mask_depth_valid_sensor = prepare_scene_obj.prepare_box_item_for_rendering(box_item,
                                                                                                scene_obj.inst_seg_3d,
