@@ -141,8 +141,11 @@ def main(args):
             mesh_full_bg.remove_vertices_by_index(prepare_scene_obj.all_obj_idx_list)
 
             out_path_bg_mesh = os.path.join(parent, config_general['results_path'], scene_name)
+
             tmp = o3d.io.write_triangle_mesh(os.path.join(out_path_bg_mesh, scene_name + '_mesh_bg.ply'), mesh_full_bg)
-            tmp = o3d.io.write_triangle_mesh(os.path.join(out_path, scene_name + "_cad_retrieval.ply"), obj_mesh_all)
+            if obj_mesh_all is not None:
+                tmp = o3d.io.write_triangle_mesh(os.path.join(out_path, scene_name + "_cad_retrieval.ply"),
+                                                 obj_mesh_all)
 
             pkl_out_file = open(pkl_out_path, 'wb')
             pickle.dump(scene_obj, pkl_out_file)

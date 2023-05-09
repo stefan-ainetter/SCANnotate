@@ -389,8 +389,10 @@ def main(args):
             pkl_out_file = open(pkl_out_path, 'wb')
             pickle.dump(scene_obj, pkl_out_file)
             pkl_out_file.close()
-            tmp = o3d.io.write_triangle_mesh(os.path.join(out_path, scene_name + "_cad_retrieval_sim.ply"),
-                                             obj_mesh_all)
+
+            if obj_mesh_all is not None:
+                tmp = o3d.io.write_triangle_mesh(os.path.join(out_path, scene_name + "_cad_retrieval_sim.ply"),
+                                                 obj_mesh_all)
 
 
 if __name__ == "__main__":
