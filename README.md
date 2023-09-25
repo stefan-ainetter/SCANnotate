@@ -8,6 +8,13 @@
 
 This repository contains the code and data for the WACV23 paper "Automatically Annotating Indoor Images with CAD Models via RGB-D Scans". 
 
+## CAD Model and Pose Annotations for ScanNet
+CAD model and pose annotations for the ScanNet dataset are 
+available [here](https://github.com/stefan-ainetter/SCANnotateDataset). 
+Annotations are automatically generated using scannotate and [HOC-Search](https://arxiv.org/abs/2309.06107). 
+The quality of these annotations was verified in several verification passes,
+with manual re-annotations performed for outliers to ensure that final annotations 
+are of high quality.
  
 ## Installation Requirements and Setup
 * Clone this repository. Create and activate the virtual environment.
