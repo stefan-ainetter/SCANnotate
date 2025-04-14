@@ -48,7 +48,7 @@ The corresponding environment file can be found at `environment.yml`.
 
 ## Data Preprocessing
 
-* Download the ScanNet example [here](https://files.icg.tugraz.at/f/bf3309cbb870443b93c9/?dl=1). Extract
+* Download the ScanNet example [here](https://cloud.tugraz.at/index.php/s/NA7icqiJ5SeNSA6/download?path=%2FScannotate%2FScanNet_example&files=ScanNet_example.zip). Extract
 the folders `extracted, preprocessed, scans` and copy them to `/data/ScanNet`. Note that by downloading the 
 example you agree to the 
 [ScanNet Terms of Use](https://kaldir.vc.in.tum.de/scannet/ScanNet_TOS.pdf).
